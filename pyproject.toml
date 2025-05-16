@@ -1,0 +1,10 @@
+[project]
+name = "payu-mcp-server"
+version = "0.1.0"
+description = "PayU MCP Server enables secure AI integration with PayU payment APIs via the Model Context Protocol (MCP)."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "httpx>=0.28.1",
+    "mcp[cli]>=1.6.0",
+]
