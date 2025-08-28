@@ -7,7 +7,7 @@
 
 ## Overview
 
-PayU MCP Server provides specialized integration that enables AI tools to securely access PayU payment APIs through the Model Context Protocol (MCP). This integration allows AI assistants to create payment links, retrieve transaction details, and access invoice information directly, making your payment workflows smarter and more efficient.
+PayU MCP Server provides specialized integration that enables AI tools to securely access PayU payment APIs through the Model Context Protocol (MCP). This integration allows AI assistants to create payment links, retrieve transaction details, access invoice information, manage refunds, and analyze settlement data directly, making your payment workflows smarter and more efficient.
 
 ## What is the Model Context Protocol (MCP)?
 
@@ -22,6 +22,11 @@ PayU MCP Server provides specialized integration that enables AI tools to secure
 | **create-payment-link** | Generate a new payment link for your customers |
 | **get-invoice-details** | Retrieve comprehensive details for any invoice ID |
 | **get-transaction-details** | Access complete transaction information |
+| **transactions-list** | Get detailed transactions list with advanced filtering options |
+| **transactions-summary** | Retrieve transaction summaries with comprehensive analytics |
+| **search-refunds-data** | Search and filter refund transactions |
+| **refunds-summary-data** | Get refund summaries and analytics |
+| **settlement-details** | Access settlement information and details |
 
 ## Getting Started
 
@@ -87,6 +92,7 @@ Run the container with your PayU credentials:
 docker run -p 8888:8888 \
   -e CLIENT_ID="YOUR_CLIENT_ID" \
   -e CLIENT_SECRET="YOUR_CLIENT_SECRET" \
+  -e AUTH_TOKEN="YOUR_BEARER_TOKEN" \
   -e MERCHANT_ID="YOUR_MERCHANT_ID" \
   -e PORT=8888 \
   payu-mcp-server python server.py --sse --port 8888
@@ -118,6 +124,7 @@ Add the following to your configuration:
       "env": {
         "CLIENT_ID": "YOUR_CLIENT_ID",
         "CLIENT_SECRET": "YOUR_CLIENT_SECRET",
+        "AUTH_TOKEN": "YOUR_BEARER_TOKEN",
         "MERCHANT_ID": "YOUR_MERCHANT_ID"
       }
     }
@@ -146,6 +153,7 @@ To obtain your API credentials, visit the [PayU Developer Portal](https://docs.p
 Required credentials:
 - **CLIENT_ID**: Your PayU client ID
 - **CLIENT_SECRET**: Your PayU client secret
+- **AUTH_TOKEN**: Your PayU bearer token (preferred method)
 - **MERCHANT_ID**: Your PayU merchant identifier
 
 ### Additional Permission Scopes
@@ -162,6 +170,14 @@ When configuring your API access, ensure you have the following permission scope
   - Enables fetching comprehensive invoice details
   - Provides access to invoice status, amounts, and related transaction information
   - Read-only permission ensures secure access to invoice data
+
+- **read_refunds**:
+  - Access to refund transaction data
+  - Enables refund status tracking and analytics
+
+- **read_settlements**:
+  - Access to settlement information
+  - Enables settlement tracking and reporting
 
 Note: Contact PayU support to confirm these specific scopes are available and properly configured for your merchant account.
 
@@ -200,6 +216,58 @@ Once configured, your AI assistant can help you fetch transaction details with a
 ```
 Provide the transaction details for <Transaction-ID>
 ```
+
+
+#### Get Transactions List
+```
+Get transactions list from 2024-01-01 00:00:00 to 2024-01-31 23:59:59 with status captured
+```
+
+#### Get Transactions Summary
+```
+Get transactions summary from 2024-01-01 00:00:00 to 2024-01-31 23:59:59 for UPI payments
+```
+
+#### Search Refunds
+```
+Search refunds from 2024-01-01 to 2024-01-31 with status success
+```
+
+#### Get Refunds Summary
+```
+Get refunds summary from 2024-01-01 to 2024-01-31
+```
+
+#### Get Settlement Details
+```
+Get settlement details for settlement ID <SETTLEMENT_ID>
+```
+
+## Advanced Features
+
+### Transaction Filtering Options
+
+The enhanced transaction tools support comprehensive filtering:
+
+- **Status Filters**: captured, failed, pending, cancelled, etc.
+- **Payment Modes**: UPI, CC, DC, NB, EMI, etc.
+- **Payment Sources**: pg, button, paymentLink, apiIntInvoice, etc.
+- **Amount Ranges**: min/max amount filtering
+- **Currency Filters**: USD, AED, AUD, CAD, GBP, OTH
+- **Date Ranges**: Flexible date range queries
+- **Additional Filters**: IVR, mobile, web, chargeback, etc.
+
+### Refund Management
+
+- Search refunds by date range and status
+- Get refund summaries and analytics
+- Support for multiple refund statuses: requested, success, failure, queued, pending, user_cancelled
+
+### Settlement Tracking
+
+- Access settlement details by settlement ID
+- Support for UTR references and transaction IDs
+- Multiple settlement status tracking
 
 ## License
 
