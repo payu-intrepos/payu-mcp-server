@@ -15,5 +15,7 @@ class PayUTokenManager:
             cls._instance.client_id = os.getenv('CLIENT_ID')
             cls._instance.client_secret = os.getenv('CLIENT_SECRET')
             cls._instance.mid = os.getenv('MERCHANT_ID')
+            # Direct auth token from environment variable
+            cls._instance.auth_token = os.getenv('AUTH_TOKEN')
         return cls._instance
 

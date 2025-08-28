@@ -170,3 +170,59 @@ async def make_request(
     else:
         logger.error("Failed to obtain valid token")
         return None
+
+
+"""
+Make a request to the PayU API using the AUTH_TOKEN environment variable as bearer token.
+This function bypasses the token refresh mechanism and uses the direct token from environment.
+
+Args:
+    url (str): API endpoint URL.
+    headers (Optional[Dict[str, str]]): Request headers. If None, default headers will be used.
+    body (Optional[Dict[str, Any]]): Request body for POST requests.
+
+Returns:
+    Optional[Dict[str, Any]]: JSON response from the API or None if request failed.
+"""
+async def make_request_with_direct_token(
+        url: str,
+        headers: Optional[Dict[str, str]] = None,
+        body: Optional[Dict[str, Any]] = None
+) -> Optional[Dict[str, Any]]:
+    
+    # Get the direct auth token from environment variable
+    if not tm.auth_token:
+        logger.error("AUTH_TOKEN environment variable not set")
+        return None
+
+    # Use provided headers or create default headers
+    request_headers = headers if headers is not None else {"Accept": "application/json"}
+    
+    # Add merchant ID if available
+    if tm.mid:
+        request_headers["mid"] = tm.mid
+    
+    # Add the bearer token from environment variable
+    request_headers["Authorization"] = f"Bearer {tm.auth_token}"
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        try:
+            if body:
+                response = await client.post(url, headers=request_headers, json=body)
+            else:
+                response = await client.get(url, headers=request_headers)
+
+            response.raise_for_status()
+            response_data = response.json()
+            logger.info(f"Received response with status {response.status_code}")
+
+            return response_data
+        except httpx.TimeoutException:
+            logger.error("Request timeout")
+            return None
+        except httpx.HTTPStatusError as e:
+            logger.error(f"HTTP error: {e.response.status_code} - {e.response.text}")
+            return None
+        except Exception as e:
+            logger.error(f"Request error: {str(e)}")
+            return None
